@@ -1,12 +1,21 @@
 import React from "react";
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.min.css';
 import './index.css';
+import styled from "styled-components";
 import { Form, Input, Checkbox, Button } from "antd";
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 
+const CustomForm = styled.form`
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width:50%;
+    height:50%;
+`
+
 const Login = () => {
     return (
-        <Form
+        <customForm
             name="login-form"
             className="login-form"
         >
@@ -48,7 +57,7 @@ const Login = () => {
                 </Button>
                 Or <a href="">register now!</a>
             </Form.Item>
-        </Form >
+        </customForm >
     );
 };
 export default Login;
