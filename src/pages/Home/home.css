@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: #333;
+  min-width: 100%;
+  max-height: 100vh;
+  box-sizing: border-box;
+}
+.body {
+  flex-direction: row;
+  max-height: 100vh;
+}

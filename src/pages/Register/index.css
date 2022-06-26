@@ -1,0 +1,17 @@
+.register-form {
+  max-width: 300px;
+}
+.register-form-forgot {
+  float: right;
+}
+.ant-col-rtl {
+  float: left;
+}
+.register-form-button {
+  width: 100%;
+  background-color: rgb(13, 146, 1) !important;
+}
+
+.register-form-button:hover {
+  background-color: rgba(13, 145, 37, 0.616) !important;
+}

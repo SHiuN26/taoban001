@@ -1,17 +1,22 @@
 import React, { useState } from "react";
 import { Layout, Sider, Menu } from "antd";
+import { MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 import styled from "styled-components";
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
 const CustomSider = styled(Layout.Sider)`
-  width: 200px;
-  background-color: #4b0361;
-  height: 100%;
+  height: 100vh;
+  /* width: 100%; */
+  background-color: #777;
 `;
 
 const CustomMenu = styled(Menu)`
-  width: 256px;
+  width: 15%;
   position: fixed;
-  z-index: 3;
   background-color: #0fb0d8;
   color: white;
   top: 7vh;
@@ -42,20 +47,28 @@ const items = [
 ];
 
 const Navbar = () => {
-  const [collapsed, setCollasped] = useState(false);
-  const toggleCollasped = () => {
-    setCollasped(!collapsed);
-  };
+  const [iscollapsed, setCollapsed] = useState(false);
+  // const toggleCollasped = () => {
+  //   setCollasped(!iscollapsed);
+  // };
   return (
-    <CustomSider>
-      <CustomMenu
-        items={items}
-        defaultSelectedKeys={["1"]}
-        defaultOpenKeys={["sub1"]}
-        mode="inline"
-        inlineCollapsed={collapsed}
-      ></CustomMenu>
-    </CustomSider>
+    <Wrapper>
+      <CustomSider
+        trigger={null}
+        collapsible
+        collapsed={iscollapsed}
+        collapsedWidth={0}
+        onCollapse={(value) => setCollapsed(value)}
+        style={{ boxSizing: "boxSizing" }}
+      >
+        <CustomMenu
+          items={items}
+          defaultSelectedKeys={["1"]}
+          defaultOpenKeys={["sub1"]}
+          mode="inline"
+        ></CustomMenu>
+      </CustomSider>
+    </Wrapper>
   );
 };
 export default Navbar;
