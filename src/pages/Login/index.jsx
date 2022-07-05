@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useRef, useState, useEffect } from "react";
 import "antd/dist/antd.min.css";
 import "./index.css";
@@ -7,6 +7,7 @@ import { Form, Input, Checkbox, Button } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import Password from "antd/lib/input/Password";
 import axios from "../../API/axios";
+import AuthContext from "../../context/AuthProvider ";
 
 const Wrapper = styled.div`
   display: flex;
@@ -15,24 +16,50 @@ const Wrapper = styled.div`
   height: 50vh;
 `;
 
+const LOGIN_URL = "http://192.168.0.124:5000/api/Login";
+
 const Login = () => {
-  const userRef = useRef();
+  const { setAuth } = useContext(AuthContext);
+  const mailRef = useRef();
+  // const userRef = useRef();
   const errRef = useRef();
 
-  const [user, set_User] = useState("");
-  const [pwd, set_Pwd] = useState("");
+  // const [user, set_User] = useState("");
+  // const [pwd, set_Pwd] = useState("");
+  const [loginType, set_loginType] = useState("Email");
+  const [email, set_Email] = useState("");
+  const [phoneNumber, set_PhoneNumber] = useState("");
+  const [hashPassword, set_HashPassword] = useState("");
+  const [isPersistent, set_IsPersistent] = useState(true);
+
   const [errMsg, set_ErrMsg] = useState("");
   const [success, set_Success] = useState(false);
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.post(JSON.stringify({ user, pwd }), {
-        headers: { "Ccontent-Type": "application/json" },
-        withCredentials: true,
-      });
-      console.log("JSON.stringify(res.data)", JSON.stringify(res.data));
-      set_User("");
-      set_Pwd("");
+      const res = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({
+          loginType,
+          email,
+          hashPassword,
+          phoneNumber,
+          isPersistent,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+          // withCredentials: true,
+        }
+      );
+      console.log("JSON.stringify(res.data)", res.data);
+      const accessToken = res?.data?.accessToken;
+      const roles = res?.data?.roles;
+      setAuth({ email, hashPassword, roles, accessToken });
+      set_Email("");
+      set_HashPassword("");
       set_Success(true);
     } catch (err) {
       if (!err?.response) {
@@ -49,12 +76,12 @@ const Login = () => {
   };
 
   useEffect(() => {
-    userRef.current.focus();
+    mailRef.current.focus();
   }, []);
 
   useEffect(() => {
     set_ErrMsg("");
-  }, [user, pwd]);
+  }, [email, hashPassword]);
 
   return (
     <Wrapper>
@@ -70,10 +97,10 @@ const Login = () => {
           <Input
             prefix={<UserOutlined className="site-form-item-icon" />}
             placeholder="Username"
-            ref={userRef}
+            ref={mailRef}
             autoComplete="off"
-            onChange={(e) => set_User(e.target.value)}
-            value={user}
+            onChange={(e) => set_Email(e.target.value)}
+            value={email}
           />
         </Form.Item>
         <Form.Item
@@ -88,8 +115,8 @@ const Login = () => {
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             placeholder="Password"
-            onChange={(e) => set_Pwd(e.target.value)}
-            value={pwd}
+            onChange={(e) => set_HashPassword(e.target.value)}
+            value={hashPassword}
           />
         </Form.Item>
         <Form.Item>

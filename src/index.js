@@ -2,11 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom";
 import MainRouter from "./routers";
 // import reportWebVitals from './reportWebVitals';
+import { AuthProvider } from "../src/context/AuthProvider ";
 
 ReactDOM.render(
-  <>
+  <AuthProvider>
     <MainRouter />
-  </>,
+  </AuthProvider>,
   document.getElementById("root")
 );
 

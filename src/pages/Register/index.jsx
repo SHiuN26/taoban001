@@ -3,13 +3,8 @@ import { useRef, useState, useEffect } from "react";
 import { Form, Input, Button } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import styled from "styled-components";
-import {
-  faCheck,
-  faTimes,
-  faInfoCircle,
-} from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 import "./index.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const Wrapper = styled.div`
   display: flex;
@@ -23,17 +18,21 @@ const Wrapper = styled.div`
 const MAIL_REGEX = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/; //此為通用信箱正則表達
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
+const REGISTER_URL = "http://192.168.0.124:5000/api/Regist";
+
 const Register = () => {
   const mailRef = useRef();
   const errRef = useRef();
 
-  const [mail, setMail] = useState("");
+  const [registType, setRegistType] = useState("Email");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [email, setEmail] = useState("");
   const [validMail, setValidMail] = useState(false);
   const [mailFocus, setMailFocus] = useState(false);
 
-  const [pwd, setPwd] = useState("");
-  const [validPwd, setValidPwd] = useState(false);
-  const [pwdFocus, setPwdFocus] = useState(false);
+  const [hashPassword, setHashPassword] = useState("");
+  const [validPwd, setValidHashPassword] = useState(false);
+  const [pwdFocus, setHashPasswordFocus] = useState(false);
 
   const [matchPwd, setMatchPwd] = useState("");
   const [validMatch, setValidMatch] = useState(false);
@@ -42,45 +41,97 @@ const Register = () => {
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
 
+  const handleSubmit = async () => {
+    // const emailTest = MAIL_REGEX.test(email);
+    // const pwdTest = PWD_REGEX.test(hashPassword);
+
+    // if (!emailTest || !pwdTest) {
+    //   setErrMsg("Invalid Entry");
+    //   console.log(emailTest, pwdTest);
+    //   return;
+    // }
+
+    // resonse_object.header("Access-Control-Allow-Origin", "*");
+    // resonse_object.header(
+    //   "Access-Control-Allow-Headers",
+    //   "Origin, X-Requested-With, Content-Type, Accept"
+    // );
+    try {
+      const res = await axios.post(
+        REGISTER_URL,
+        JSON.stringify({ registType, email, hashPassword, phoneNumber }),
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+          },
+          // withCredentials: true, //Access-Control-Allow-Origin": "*" 設定為星號時不支援帳號密碼，所以 withCredentials不能設定為true
+        }
+      );
+      console.log("res", res?.data);
+      console.log("accessToken", res?.accessToken);
+      console.log("JSON.Stringify(res)", JSON.Stringify(res));
+      setSuccess(true);
+      setEmail("");
+      setHashPassword("");
+      setMatchPwd("");
+    } catch (err) {
+      if (!err?.res) {
+        setErrMsg("No server response");
+      } else if (err.res?.status === 409) {
+        setErrMsg("Mail Taken");
+      } else {
+        setErrMsg("Registeration Failed");
+      }
+      errRef.current.focus();
+    }
+  };
+
   useEffect(() => {
     mailRef.current.focus();
   }, []);
 
   useEffect(() => {
-    const result = MAIL_REGEX.test(mail);
+    const result = MAIL_REGEX.test(email);
     console.log("result", result);
-    console.log("mail", mail);
+    console.log("mail", email);
     setValidMail(result);
-  }, [mail]);
+  }, [email]);
 
   useEffect(() => {
-    const result = PWD_REGEX.test(pwd);
+    const result = PWD_REGEX.test(hashPassword);
     console.log("result", result);
-    console.log("pwd", pwd);
-    setValidPwd(result);
-    const match = pwd === matchPwd;
+    console.log("hashPassword", hashPassword);
+    setValidHashPassword(result);
+    const match = hashPassword === matchPwd;
     setValidMatch(match);
-  }, [pwd, matchPwd]);
+  }, [hashPassword, matchPwd]);
 
   useEffect(() => {
     setErrMsg("");
-  }, [mail, pwd, matchPwd]);
+  }, [email, hashPassword, matchPwd]);
 
   return (
     <Wrapper>
-      <Form name="register-form" className="register-form">
+      <Form
+        name="register-form"
+        className="register-form"
+        onFinish={handleSubmit}
+      >
         <h1>Register</h1>
         <Form.Item
           name="mail"
           rules={[{ required: true }, { message: "mail is required!" }]}
         >
           <Input
+            type="text"
             prefix={<MailOutlined className="site-form-item-icon" />}
             placeholder="email"
             ref={mailRef}
             autoComplete="off"
-            onChange={(e) => setMail(e.target.value)}
-            value={mail}
+            onFocus={() => setMailFocus(true)}
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
           />
         </Form.Item>
         <Form.Item
@@ -90,10 +141,12 @@ const Register = () => {
           <Input.Password
             prefix={<LockOutlined className="site-form-item-icon" />}
             placeholder="Password"
-            onChange={(e) => setPwd(e.target.value)}
-            value={pwd}
+            onChange={(e) => setHashPassword(e.target.value)}
+            onFocus={() => setHashPasswordFocus(true)}
+            value={hashPassword}
           />
         </Form.Item>
+
         <Form.Item
           name="confirm-password"
           rules={[
@@ -107,6 +160,7 @@ const Register = () => {
             prefix={<LockOutlined className="site-form-item-icon" />}
             placeholder="confirm-password"
             onChange={(e) => setMatchPwd(e.target.value)}
+            onFocus={() => setMailFocus(true)}
             value={matchPwd}
           />
         </Form.Item>
