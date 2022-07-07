@@ -3,11 +3,16 @@ import ReactDOM from "react-dom";
 import MainRouter from "./routers";
 // import reportWebVitals from './reportWebVitals';
 import { AuthProvider } from "../src/context/AuthProvider ";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 ReactDOM.render(
-  <AuthProvider>
-    <MainRouter />
-  </AuthProvider>,
+  <BrowserRouter>
+    <AuthProvider>
+      <Routes>
+        <MainRouter />
+      </Routes>
+    </AuthProvider>
+  </BrowserRouter>,
   document.getElementById("root")
 );
 
