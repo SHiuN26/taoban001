@@ -1,10 +1,11 @@
 import React from "react";
 import { useRef, useState, useEffect } from "react";
-import { Form, Input, Button } from "antd";
+import { Form, Input, Button, message } from "antd";
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import axios from "axios";
-import "./index.css";
+import "./Register.css";
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,24 +39,10 @@ const Register = () => {
   const [validMatch, setValidMatch] = useState(false);
   const [matchFocus, setMatchFocus] = useState(false);
 
-  const [errMsg, setErrMsg] = useState("");
+  // const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async () => {
-    // const emailTest = MAIL_REGEX.test(email);
-    // const pwdTest = PWD_REGEX.test(hashPassword);
-
-    // if (!emailTest || !pwdTest) {
-    //   setErrMsg("Invalid Entry");
-    //   console.log(emailTest, pwdTest);
-    //   return;
-    // }
-
-    // resonse_object.header("Access-Control-Allow-Origin", "*");
-    // resonse_object.header(
-    //   "Access-Control-Allow-Headers",
-    //   "Origin, X-Requested-With, Content-Type, Accept"
-    // );
     try {
       const res = await axios.post(
         REGISTER_URL,
@@ -64,6 +51,7 @@ const Register = () => {
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
+            // withCredentials: true,
           },
           // withCredentials: true, //Access-Control-Allow-Origin": "*" 設定為星號時不支援帳號密碼，所以 withCredentials不能設定為true
         }
@@ -77,11 +65,11 @@ const Register = () => {
       setMatchPwd("");
     } catch (err) {
       if (!err?.res) {
-        setErrMsg("No server response");
+        message.error("No server response");
       } else if (err.res?.status === 409) {
-        setErrMsg("Mail Taken");
+        message.error("Mail Taken");
       } else {
-        setErrMsg("Registeration Failed");
+        message.error("Registeration Failed");
       }
       errRef.current.focus();
     }
@@ -108,7 +96,7 @@ const Register = () => {
   }, [hashPassword, matchPwd]);
 
   useEffect(() => {
-    setErrMsg("");
+    message.error("");
   }, [email, hashPassword, matchPwd]);
 
   return (
@@ -172,6 +160,7 @@ const Register = () => {
           >
             Register Now
           </Button>
+          <Link to="/Login">Or Log in </Link>
         </Form.Item>
       </Form>
     </Wrapper>

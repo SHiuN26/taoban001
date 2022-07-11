@@ -8,6 +8,9 @@ import {
   SettingOutlined,
 } from "@ant-design/icons";
 import "./home.css";
+import { useContext } from "react";
+import AuthContext from "../context/AuthProvider ";
+import { useNavigate } from "react-router-dom";
 // import MyHeader from "../../components/Header";
 // import Navbar from "../../components/Navbar/Navbar";
 
@@ -69,8 +72,12 @@ const items = [
 ];
 
 const Home = () => {
+  const { setAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [isNavBar, set_isNavBar] = useState(false);
   const [current, set_Current] = useState("1");
+
   const onClick = (e) => {
     console.log("click", e);
     set_Current(e.key);
@@ -78,7 +85,7 @@ const Home = () => {
   return (
     <Layout className="wrapper">
       <CustomHeader>
-        <h1 className="title">套版一號院</h1>
+        <h1 className="title">新北看守所</h1>
       </CustomHeader>
       <Layout className="body">
         <CustomSider

@@ -1,13 +1,14 @@
-import React, { useContext } from "react";
 import { useRef, useState, useEffect } from "react";
-import "antd/dist/antd.min.css";
-import "./index.css";
-import styled from "styled-components";
-import { Form, Input, Checkbox, Button } from "antd";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Form, Input, Checkbox, Button, message } from "antd";
+import useAuth from "../hooks/useAuth.jsx";
+
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import Password from "antd/lib/input/Password";
-import axios from "../../API/axios";
-import AuthContext from "../../context/AuthProvider ";
+import axios from "../API/axios";
+
+import styled from "styled-components";
+import "./Login.css";
+import "antd/dist/antd.min.css";
 
 const Wrapper = styled.div`
   display: flex;
@@ -16,23 +17,24 @@ const Wrapper = styled.div`
   height: 50vh;
 `;
 
-const LOGIN_URL = "http://192.168.0.124:5000/api/Login";
+const LOGIN_URL = "/api/Login";
+const ROLE_URL = "/api/Role/GetRoles";
 
 const Login = () => {
-  const { setAuth } = useContext(AuthContext);
-  const mailRef = useRef();
-  // const userRef = useRef();
-  const errRef = useRef();
+  const { set_Auth } = useAuth();
 
-  // const [user, set_User] = useState("");
-  // const [pwd, set_Pwd] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
+  const mailRef = useRef();
+
   const [loginType, set_loginType] = useState("Email");
   const [email, set_Email] = useState("");
   const [phoneNumber, set_PhoneNumber] = useState("");
   const [hashPassword, set_HashPassword] = useState("");
   const [isPersistent, set_IsPersistent] = useState(true);
 
-  const [errMsg, set_ErrMsg] = useState("");
   const [success, set_Success] = useState(false);
 
   const handleSubmit = async () => {
@@ -50,28 +52,47 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
+            // withCredentials: true,
           },
-          // withCredentials: true,
         }
       );
-      console.log("JSON.stringify(res.data)", res.data);
-      const accessToken = res?.data?.accessToken;
-      const roles = res?.data?.roles;
-      setAuth({ email, hashPassword, roles, accessToken });
-      set_Email("");
-      set_HashPassword("");
-      set_Success(true);
+
+      // console.log("res === ", res);
+      const nn = JSON.parse(res?.config?.data);
+      console.log("nn === ", nn);
+      const accessToken = res?.data?.token;
+
+      if (res.data.isSuccess) {
+        message.success("登入成功");
+        const roles = await axios.get(ROLE_URL, {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            Authorization: `Bearer ${res?.data?.token}`,
+          },
+        });
+        const authRoles = roles.data[0];
+        console.log("authRoles", authRoles);
+        set_Auth({ email, hashPassword, authRoles, accessToken });
+        set_Email("");
+        set_HashPassword("");
+        set_Success(true);
+        navigate(from, { replace: true });
+      } else {
+        message.error("登入失敗，請確認帳號密碼!!");
+      }
     } catch (err) {
       if (!err?.response) {
-        set_ErrMsg("No Server Response");
+        // console.log("err.response", err.response);
+        // message.error("伺服器無回應");
       } else if (err.response?.status === 400) {
-        set_ErrMsg("Missing Username or Password");
+        message.error("遺失帳號或密碼");
       } else if (err.response?.status === 401) {
-        set_ErrMsg("Unauthorized");
+        message.error("帳號無相關權限");
       } else {
-        set_ErrMsg("Login Failed");
+        message.error("登入失敗");
       }
-      errRef.current.focus();
+      // errRef.current.focus();
     }
   };
 
@@ -79,9 +100,8 @@ const Login = () => {
     mailRef.current.focus();
   }, []);
 
-  useEffect(() => {
-    set_ErrMsg("");
-  }, [email, hashPassword]);
+  // useEffect(() => {
+  // }, [email, hashPassword]);
 
   return (
     <Wrapper>
@@ -136,7 +156,7 @@ const Login = () => {
           >
             Log in
           </Button>
-          Or <a href="">register now!</a>
+          Or <Link to="/Register">Sign up</Link>
         </Form.Item>
       </Form>
     </Wrapper>
