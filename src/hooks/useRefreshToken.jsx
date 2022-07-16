@@ -6,7 +6,7 @@ const useRefreshToken = () => {
 
   const refresh = async () => {
     const res = await axios.get("/refresh", {
-      withCredentials: true,
+      // withCredentials: true,
     });
     set_Auth((prev) => {
       console.log(JSON.stringify(prev));
@@ -16,8 +16,6 @@ const useRefreshToken = () => {
     return res.data.assessToken;
   };
   return refresh;
-
-  return <div>useRefreshToken</div>;
 };
 
 export default useRefreshToken;

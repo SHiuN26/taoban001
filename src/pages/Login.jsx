@@ -21,7 +21,7 @@ const LOGIN_URL = "/api/Login";
 const ROLE_URL = "/api/Role/GetRoles";
 
 const Login = () => {
-  const { set_Auth } = useAuth();
+  const { auth, set_Auth } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,6 +34,7 @@ const Login = () => {
   const [phoneNumber, set_PhoneNumber] = useState("");
   const [hashPassword, set_HashPassword] = useState("");
   const [isPersistent, set_IsPersistent] = useState(true);
+  const [allRoles, set_All_Roles] = useState([]);
 
   const [success, set_Success] = useState(false);
 
@@ -57,13 +58,9 @@ const Login = () => {
         }
       );
 
-      // console.log("res === ", res);
-      const nn = JSON.parse(res?.config?.data);
-      console.log("nn === ", nn);
-      const accessToken = res?.data?.token;
-
       if (res.data.isSuccess) {
         message.success("登入成功");
+        console.log("res === ", res);
         const roles = await axios.get(ROLE_URL, {
           headers: {
             "Content-Type": "application/json",
@@ -71,12 +68,15 @@ const Login = () => {
             Authorization: `Bearer ${res?.data?.token}`,
           },
         });
-        const authRoles = roles.data[0];
-        console.log("authRoles", authRoles);
-        set_Auth({ email, hashPassword, authRoles, accessToken });
+        const accessToken = res?.data?.token;
+
+        console.log("roles === ", roles);
+        set_All_Roles(roles.data);
+        set_Auth({ email, hashPassword, accessToken, allRoles: roles.data });
         set_Email("");
         set_HashPassword("");
         set_Success(true);
+        localStorage.setItem("accessToken", accessToken);
         navigate(from, { replace: true });
       } else {
         message.error("登入失敗，請確認帳號密碼!!");
@@ -96,12 +96,12 @@ const Login = () => {
     }
   };
 
+  console.log("allRoles === ", allRoles);
+  console.log("auth", auth);
+
   useEffect(() => {
     mailRef.current.focus();
   }, []);
-
-  // useEffect(() => {
-  // }, [email, hashPassword]);
 
   return (
     <Wrapper>

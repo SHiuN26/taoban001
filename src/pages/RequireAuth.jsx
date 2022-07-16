@@ -1,21 +1,17 @@
-import { useEffect } from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 
 const RequireAuth = ({ allowedRoles }) => {
   const { auth } = useAuth();
   const location = useLocation();
+  console.log("auth", auth);
 
-  useEffect(() => {
-    console.log("auth", auth);
-  }, [auth]);
-  // return auth?.authRoles?.find((role) => allowedRoles?.includes(role)) ? (
-  return auth?.authRoles ? (
+  return auth?.allRoles?.find((role) => allowedRoles?.includes(role)) ? (
     <Outlet />
-  ) : auth.email ? (
-    <Navigate to="/unauthorized" state={{ from: location }} replace />
+  ) : auth.allRoles.length === 0 ? (
+    <Navigate to="/unauthorized" state={{ from: location }} replace={true} />
   ) : (
-    <Navigate to="/Login" state={{ from: location }} replace />
+    <Navigate to="/Login" state={{ from: location }} replace={true} />
   );
 };
 

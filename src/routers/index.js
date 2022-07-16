@@ -6,7 +6,6 @@ import Layout from "../pages/Layout";
 import RequireAuth from "../pages/RequireAuth";
 import Missing from "../pages/Missing";
 import Unauthorized from "../pages/Unauthorized";
-import Admin from "../pages/Admin";
 
 const MainRouter = () => {
   return (
@@ -15,13 +14,17 @@ const MainRouter = () => {
         {/* public routes */}
         <Route path="Login" element={<Login />} />
         <Route path="Register" element={<Register />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
+        <Route path="Unauthorized" element={<Unauthorized />} />
+
         {/* we want to protect these routes */}
 
-        <Route element={<RequireAuth allowedRoles={["admin@abc.com"]} />}>
+        <Route
+          element={<RequireAuth allowedRoles={["Merchant", "Administrator"]} />}
+        >
+          <Route index element={<Home />} /> {/*子路由*/}
           <Route path="/" element={<Home />} />
-          <Route path="/Admin" element={<Admin />} />
         </Route>
+
         <Route path="*" element={<Missing />} />
       </Route>
     </Routes>

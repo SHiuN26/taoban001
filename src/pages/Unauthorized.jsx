@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
-
+import { useNavigate, useLocation } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 const Unauthorized = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const goBack = () => navigate(-1);
 
   return (
