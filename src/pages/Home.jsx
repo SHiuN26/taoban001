@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Layout, Breadcrumb, Menu } from "antd";
 import {
@@ -72,11 +72,19 @@ const items = [
 ];
 
 const Home = () => {
-  const { setAuth } = useContext(AuthContext);
+  const { auth, set_Auth } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [isNavBar, set_isNavBar] = useState(false);
   const [current, set_Current] = useState("1");
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
+      set_Auth(auth, accessToken);
+    }
+    console.log("auth", auth);
+  }, []);
 
   const onClick = (e) => {
     console.log("click", e);

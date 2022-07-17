@@ -22,7 +22,7 @@ const MainRouter = () => {
           element={<RequireAuth allowedRoles={["Merchant", "Administrator"]} />}
         >
           <Route index element={<Home />} /> {/*子路由*/}
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
         </Route>
 
         <Route path="*" element={<Missing />} />

@@ -68,15 +68,16 @@ const Login = () => {
             Authorization: `Bearer ${res?.data?.token}`,
           },
         });
-        const accessToken = res?.data?.token;
+        // const accessToken = res?.data?.token;
 
         console.log("roles === ", roles);
         set_All_Roles(roles.data);
-        set_Auth({ email, hashPassword, accessToken, allRoles: roles.data });
+        // set_Auth({ email, hashPassword, accessToken, allRoles: roles.data });
+        set_Auth({ email, hashPassword, allRoles: roles.data });
         set_Email("");
         set_HashPassword("");
         set_Success(true);
-        localStorage.setItem("accessToken", accessToken);
+        // localStorage.setItem("accessToken", accessToken);
         navigate(from, { replace: true });
       } else {
         message.error("登入失敗，請確認帳號密碼!!");
@@ -96,8 +97,8 @@ const Login = () => {
     }
   };
 
-  console.log("allRoles === ", allRoles);
-  console.log("auth", auth);
+  // console.log("allRoles === ", allRoles);
+  // console.log("auth", auth);
 
   useEffect(() => {
     mailRef.current.focus();
