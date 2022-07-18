@@ -9,8 +9,6 @@ export const AuthProvider = ({ children }) => {
   const [auth, set_Auth] = useState({});
   const [accessToken, set_AccessToken] = useState("");
 
-  const navigate = useNavigate();
-
   const getToken = () => {
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken !== "") {
@@ -20,18 +18,25 @@ export const AuthProvider = ({ children }) => {
   };
 
   const getRoles = async () => {
-    const roles = await axios.get(ROLE_URL, {
-      headers: {
-        "Content-Type": "application/json",
-        // "Access-Control-Allow-Origin": "*",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    console.log("roles", roles);
-    if (roles.status === 200 && roles.data.length !== 0) {
-      set_Auth(...auth, roles.data);
-      console.log("auth", auth);
-      // navigate("/home", { replace: true });
+    try {
+      const roles = await axios
+        .get(ROLE_URL, {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+        .then(function (response) {
+          console.log(response.data);
+        });
+    } catch (err) {
+      if (err.response) {
+        console.log("err.response", err.response);
+        if (err.response.status) {
+          console.log("err.response.status", err.response.status);
+        }
+      }
     }
   };
 
