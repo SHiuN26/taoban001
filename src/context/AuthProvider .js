@@ -10,14 +10,21 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, set_AccessToken] = useState("");
 
   const getToken = () => {
-    const accessToken = localStorage.getItem("accessToken");
-    if (accessToken !== "") {
-      set_AccessToken(accessToken);
-      // console.log("accessToken === ", accessToken);
+    const token = localStorage.getItem("accessToken");
+    console.log("token", token);
+    if (token === null) {
+      console.log("token is null");
+      return;
+    } else {
+      set_AccessToken(token);
+      localStorage.setItem("accessToken", accessToken);
+      console.log("accessToken", accessToken);
+      getRoles();
     }
   };
 
   const getRoles = async () => {
+    console.log("accessToken", accessToken);
     try {
       const roles = await axios
         .get(ROLE_URL, {
@@ -29,12 +36,13 @@ export const AuthProvider = ({ children }) => {
         })
         .then(function (response) {
           console.log(response.data);
+          console.log("roles", roles);
         });
     } catch (err) {
       if (err.response) {
-        console.log("err.response", err.response);
-        if (err.response.status) {
+        if (err.response.status === 401) {
           console.log("err.response.status", err.response.status);
+          // localStorage.removeItem("accessToken");
         }
       }
     }
@@ -42,14 +50,12 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     getToken();
-    if (accessToken !== "") {
-      console.log("accessToken === ", accessToken);
-      getRoles();
-    }
-  }, [accessToken]);
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ auth, set_Auth }}>
+    <AuthContext.Provider
+      value={{ auth, set_Auth, accessToken, set_AccessToken }}
+    >
       {children}
     </AuthContext.Provider>
   );

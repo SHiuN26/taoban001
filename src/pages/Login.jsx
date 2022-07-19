@@ -21,7 +21,7 @@ const LOGIN_URL = "/api/Login";
 const ROLE_URL = "/api/Role/GetRoles";
 
 const Login = () => {
-  const { auth, set_Auth } = useAuth();
+  const { auth, set_Auth, accessToken, set_AccessToken } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -68,8 +68,9 @@ const Login = () => {
             Authorization: `Bearer ${res?.data?.token}`,
           },
         });
-        // const accessToken = res?.data?.token;
-
+        localStorage.setItem("accessToken", accessToken);
+        const token = localStorage.getItem("accessToken");
+        set_AccessToken(res?.data?.token);
         console.log("roles === ", roles);
         set_All_Roles(roles.data);
         // set_Auth({ email, hashPassword, accessToken, allRoles: roles.data });
@@ -77,7 +78,6 @@ const Login = () => {
         set_Email("");
         set_HashPassword("");
         set_Success(true);
-        // localStorage.setItem("accessToken", accessToken);
         navigate(from, { replace: true });
       } else {
         message.error("登入失敗，請確認帳號密碼!!");

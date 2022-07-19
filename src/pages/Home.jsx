@@ -72,7 +72,8 @@ const items = [
 ];
 
 const Home = () => {
-  const { auth, set_Auth } = useContext(AuthContext);
+  const { auth, set_Auth, accessToken, set_AccessToken } =
+    useContext(AuthContext);
   const navigate = useNavigate();
 
   const [isNavBar, set_isNavBar] = useState(false);
@@ -80,8 +81,9 @@ const Home = () => {
 
   useEffect(() => {
     const accessToken = localStorage.getItem("accessToken");
+    console.log("accessToken", accessToken);
     if (accessToken) {
-      set_Auth(auth, accessToken);
+      set_Auth(auth);
     }
     console.log("auth", auth);
   }, []);
