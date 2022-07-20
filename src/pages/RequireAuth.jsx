@@ -1,9 +1,11 @@
 import { useEffect } from "react";
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import AuthContext from "../context/AuthProvider .js";
 
 const RequireAuth = ({ allowedRoles }) => {
-  const { auth, set_Auth } = useAuth();
+  const { auth, set_Auth, accessToken, set_AccessToken } = useAuth(AuthContext);
+
   const location = useLocation();
   console.log("auth", auth);
 
